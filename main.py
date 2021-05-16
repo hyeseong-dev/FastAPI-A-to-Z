@@ -1,7 +1,7 @@
 import uvicorn
 from typing import Optional
 from enum import Enum
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 
@@ -22,6 +22,9 @@ class Item(BaseModel):
     description: Optional[str] = None
     price: float
     tax: Optional[float] = None
+
+
+
 
 @app.post("/items/")
 async def create_item(item:Item):
@@ -88,6 +91,22 @@ async def read_user_me():
 @app.get("/items/{item_id}")
 async def root(item_id: int):
     return {"item_id": item_id}
+
+# Query Parameters and String Validations
+@app.get('/items/')
+async def read_items(q: Optional[str] = Query(None, max_length=50)):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q":q})
+    return results
+
+# Add more validations
+@app.get('/items/')
+async def read_items(q: Optional[str] = Query(None, min_length=3, max_length=50)):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q":q})
+    return results
 
 if __name__  == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=2)
