@@ -108,5 +108,32 @@ async def read_items(q: Optional[str] = Query(None, min_length=3, max_length=50)
         results.update({"q":q})
     return results
 
+# Add regular expressions
+@app.get("/items/")
+async def read_items(
+    q: Optional[str] = Query(None, min_length=3, max_length=50, regex="^fixedquery&")
+):
+    results = {'items': [{'item_id': 'Foo'}, {'item_id': 'Bar'}]}
+    if q: 
+        results.update({'q':q})
+    return results
+
+# Default values
+@app.get("/items/")
+async def read_items(q: str = Query("fixedquery", min_length=3)):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
+
+# Make it required
+@app.get("/items/")
+async def read_items(q: str = Query(..., min_length=3)):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
 if __name__  == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=2)
