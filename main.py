@@ -2,7 +2,7 @@ import uvicorn
 from typing import Optional, List
 from enum import Enum
 from fastapi import FastAPI, Query, Path , Body
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ModelName(str, Enum):
@@ -19,8 +19,10 @@ app = FastAPI()
 
 class Item(BaseModel):
     name: str
-    description: Optional[str] = None
-    price: float
+    description: Optional[str] = Field(
+        None, title="the description of the item", max_length=300
+    )
+    price: float = Field(..., gt=0, description="the price must be greater than zero")
     tax: Optional[float] = None
 
 class User(BaseModel):
@@ -29,18 +31,8 @@ class User(BaseModel):
 
 
 @app.put("/items/{item_id}")
-async def update_item(
-    *,
-    item_id: int = Path(..., title="the id of the item to get", ge=0, le=1000),
-    q: Optional[str] = None,
-    item: Item,
-    user: User,
-):
-    results = {"item_id": item_id}
-    if q:
-        results.update({"q":q})
-    if item:
-        results.update({"item":item})
+async def update_item(item_id: int, item: Item = Body(..., embed=True)):
+    results = {"item_id": item_id, 'item': item}
     return results
 
 @app.put("/Singular values in body/{item_id}")
