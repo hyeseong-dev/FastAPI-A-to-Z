@@ -1,5 +1,5 @@
 import uvicorn
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
@@ -133,6 +133,12 @@ async def read_items(q: str = Query(..., min_length=3)):
     if q:
         results.update({"q": q})
     return results
+
+# Query parameter list / multiple values
+@app.get('/items/')
+async def read_items(q: Optional[List[str]] = Query(None)):
+    query_items = {"q":q}
+    return query_items
 
 
 if __name__  == "__main__":
