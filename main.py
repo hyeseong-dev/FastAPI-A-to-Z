@@ -56,6 +56,25 @@ async def read_items(
     return results
 
 
+@app.get('/Deprecating parameters/', tags=['Deprecating parameters'])
+async def read_items(
+    q: Optional[str] = Query(
+        None, 
+        alias="아이템 쿼리",
+        title="쿼리 문자",
+        description="설명문서에요.",
+        min_length=3,
+        max_length=10,
+        regex="^한글로입력$",
+        deprecated=True
+        )
+):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q":q})
+    return results
+
+
 
 
 if __name__  == "__main__":
