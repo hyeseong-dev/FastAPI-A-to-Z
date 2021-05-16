@@ -41,5 +41,22 @@ async def read_items(
         results.update({"q":q})
     return results
 
+
+@app.get('/item/', tags=['Alias parameters¶'])
+async def read_items(
+    q: Optional[str] = Query(
+        None, 
+        alias="item-query",
+        min_length=3
+        )
+):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q":q})
+    return results
+
+
+
+
 if __name__  == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=2)
